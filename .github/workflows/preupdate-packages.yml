@@ -1,0 +1,32 @@
+name: Manual Package Pre Updater
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-vds:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Choose package to update
+        id: choose-package
+        run: echo "package_name=${{ github.event.inputs.package || 'eslint' }}" >> $GITHUB_OUTPUT
+
+      - name: Get latest package version from NPM
+        id: latest-version
+        run: |
+          if [ "${{ steps.choose-package.outputs.package_name }}" = "avia" ]; then
+          pkg="eslint"
+          else
+          pkg="prettier"
+          fi
+          echo "Using package: $pkg"
+          echo "version=$(npm view $pkg version)" >> $GITHUB_OUTPUT
