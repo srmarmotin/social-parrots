@@ -1,10 +1,14 @@
-name: Manual Package Pre Updater
+name: Manual Package Pre Updater For Avia.js
 
 on:
   workflow_dispatch:
 
+env:
+  PACKAGES: '@inertiajs/react prettier'
+  PACKAGE_PATH: 'package.json'
+
 jobs:
-  update-vds:
+  update-avia:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,17 +20,34 @@ jobs:
         with:
           node-version: 18
 
-      - name: Choose package to update
-        id: choose-package
-        run: echo "package_name=${{ github.event.inputs.package || 'eslint' }}" >> $GITHUB_OUTPUT
-
-      - name: Get latest package version from NPM
-        id: latest-version
+      - name: Get latest versions and check outdated packages
+        id: check-outdated
         run: |
-          if [ "${{ steps.choose-package.outputs.package_name }}" = "avia" ]; then
-          pkg="eslint"
-          else
-          pkg="prettier"
-          fi
-          echo "Using package: $pkg"
-          echo "version=$(npm view $pkg version)" >> $GITHUB_OUTPUT
+          outdated=""
+          tmp_file=${PACKAGE_PATH}.tmp
+          cp $PACKAGE_PATH "$tmp_file"
+          for pkg in $PACKAGES; do
+            latest=$(npm view $pkg version)
+            current=$(jq -r ".dependencies[\"$pkg\"]" "$PACKAGE_PATH")
+            if [ -n "$current" ] && [ "$current" != "$latest" ]; then
+              echo "$pkg is outdated: $current --> $latest"
+              jq --arg pkg "$pkg" --arg version "$latest" 
+              'if .dependencies[$pkg] then .dependencies[$pkg] = $latest else . end' 
+              "$tmp_file" > "$tmp_file.new" && mv "$tmp_file.new" "$tmp_file"
+              outdated="true"
+            fi
+          done
+          mv "$tmp_file" "$PACKAGE_PATH"
+          echo "outdated=$outdated" >> $GITHUB_OUTPUT
+
+      - name: Create PR if outdated
+        if: steps.check-outdated.outputs.outdated == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'chore: Update avia packages to latest versions'
+          title: 'Update packages to latest versions'
+          body: |
+            This PR updates the following packages to their latest versions:
+            ${{ env.PACKAGES }}
+            path: ${{ env.PACKAGE_PATH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
