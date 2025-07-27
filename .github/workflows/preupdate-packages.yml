@@ -32,12 +32,13 @@ jobs:
             if [ -n "$current" ] && [ "$current" != "$latest" ]; then
               echo "$pkg is outdated: $current --> $latest"
               jq --arg pkg "$pkg" --arg version "$latest" '
-              if .dependencies[$pkg] then .dependencies[$pkg] = $latest else . end
+              if .dependencies[$pkg] then .dependencies[$pkg] = $version else . end
               ' "$tmp_file" > "$tmp_file.new" && mv "$tmp_file.new" "$tmp_file"
               outdated="true"
             fi
           done
           mv "$tmp_file" "$PACKAGE_PATH"
+          [ -f "$tmp_file.new" ] && rm "$tmp_file.new"
           echo "outdated=$outdated" >> $GITHUB_OUTPUT
 
       - name: Create PR if outdated
