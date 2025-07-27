@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  PACKAGES: '@inertiajs/react prettier'
+  PACKAGES: '@inertiajs/react @types/react'
   PACKAGE_PATH: 'package.json'
 
 jobs:
@@ -44,8 +44,9 @@ jobs:
         if: steps.check-outdated.outputs.outdated == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: 'chore: Update avia packages to latest versions'
-          title: 'Update packages to latest versions'
+          branch: 'chore/update-avia'
+          commit-message: 'chore: Update Avia packages to latest versions'
+          title: 'chore: Update avia  package'
           body: |
             This PR updates the following packages to their latest versions:
             ${{ env.PACKAGES }}
