@@ -1,4 +1,4 @@
-name: Manual Package Pre Updater For Avia.js
+name: Package Pre Updater For Avia.js
 
 on:
   workflow_dispatch:
@@ -45,11 +45,9 @@ jobs:
         if: steps.check-outdated.outputs.outdated == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: 'chore/update-avia'
           commit-message: 'chore: Update Avia packages to latest versions'
           title: 'chore: Update avia  package'
           body: |
-            This PR updates the following packages to their latest versions:
-            ${{ env.PACKAGES }}
-            path: ${{ env.PACKAGE_PATH }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+            This PR updates the following packages to their latest versions: ${{ env.PACKAGES }}
