@@ -31,9 +31,9 @@ jobs:
             current=$(jq -r ".dependencies[\"$pkg\"]" "$PACKAGE_PATH")
             if [ -n "$current" ] && [ "$current" != "$latest" ]; then
               echo "$pkg is outdated: $current --> $latest"
-              jq --arg pkg "$pkg" --arg version "$latest" 
-              'if .dependencies[$pkg] then .dependencies[$pkg] = $latest else . end' 
-              "$tmp_file" > "$tmp_file.new" && mv "$tmp_file.new" "$tmp_file"
+              jq --arg pkg "$pkg" --arg version "$latest" '
+              if .dependencies[$pkg] then .dependencies[$pkg] = $latest else . end
+              ' "$tmp_file" > "$tmp_file.new" && mv "$tmp_file.new" "$tmp_file"
               outdated="true"
             fi
           done
