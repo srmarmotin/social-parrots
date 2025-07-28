@@ -3,7 +3,7 @@ on:
     workflow_dispatch:
 env:
     PACKAGES: '@inertiajs/react @types/react'
-    PACKAGE_PATHS: 'apps/*/package.json packages/*/package.json'
+    PACKAGE_PATHS: './apps/*/package.json ./packages/*/package.json'
     IGNORED_PATHS: '*/apps/ptv*/* */apps/chromecast*/* */node_modules/*'
 
 jobs:
@@ -26,12 +26,15 @@ jobs:
               run: |
                   outdated=""
 
-                  find_cmd="find . -path \"./${PACKAGE_PATHS}\""
-                  for ignore in $IGNORED_PATHS; do
-                    find_cmd="$find_cmd -not -path \"*/$ignore\""
+                  for path in $PACKAGE_PATHS; do
+                    include+=" -o -path \"$path\""
                   done
-                  pkg_files=$(eval $find_cmd)
-                  echo "Found package files: $pkg_files"
+                  find_cmd="find . \\(${include/-o /} \\)"
+
+                  for ignore in $IGNORED_PATHS; do
+                    find_cmd+=" -not -path \"$ignore\""
+                  done
+                  echo "Finding package.json files with command: $find_cmd"           
 
                   for pkg_file in $pkg_files; do
                       echo "Checking $pkg_file for VDS packages..."
