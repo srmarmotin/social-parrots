@@ -35,6 +35,7 @@ jobs:
                     find_cmd+=" -not -path \"$ignore\""
                   done
                   echo "Finding package.json files with command: $find_cmd"           
+                  pkg_files=$(eval $find_cmd)
 
                   for pkg_file in $pkg_files; do
                       echo "Checking $pkg_file for VDS packages..."
