@@ -72,8 +72,27 @@ jobs:
               run: |
                   pnpm install --no-frozen-lockfile
 
-            - name: Create PR if outdated
-              if: steps.check-outdated.outputs.outdated == 'true'
+            - name: Check for existing PR
+              id: check_pr
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      pr_exists = "false";
+                      const { data: pulls } = await github.rest.pulls.list({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        state: 'open',
+                        head: `${context.repo.owner}:chore/update-vds`
+                      });
+                      const exists = pulls.some(pr => pr.title === 'chore: Update VDS packages');
+                      if (exists) {
+                        pr_exists = "true";
+                      }
+                      echo context.repo.owner + ":chore/update-vds";
+                      echo "pr_exists=$pr_exists" >> $GITHUB_OUTPUT
+
+            - name: Create PR if outdated and not already open
+              if: ${{ steps.check-outdated.outputs.outdated == 'true' && steps.check_pr.outputs.pr_exists == 'false'}}
               uses: peter-evans/create-pull-request@v5
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
