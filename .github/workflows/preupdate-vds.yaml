@@ -84,7 +84,7 @@ jobs:
                         head: `${context.repo.owner}:chore/update-vds`
                       });
                       const exists = pulls.some(pr => pr.title === 'chore: Update VDS packages');
-                      core.setOutput("pr_exists", pr_exists);
+                      core.setOutput("pr_exists", exists.toString());
 
             - name: Create PR if outdated and not already open
               if: ${{ steps.check-outdated.outputs.outdated == 'true' && steps.check_pr.outputs.pr_exists == 'false'}}
