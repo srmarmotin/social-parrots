@@ -1,10 +1,16 @@
 name: Package Pre Updater For VDS
+
 on:
+    schedule:
+        - cron: '0 0 * * *'
     workflow_dispatch:
+
 env:
     PACKAGES: '@inertiajs/react @types/react'
     PACKAGE_PATHS: './apps/*/package.json ./packages/*/package.json'
     IGNORED_PATHS: '*/apps/ptv*/* */apps/chromecast*/* */node_modules/*'
+    BRANCH_TARGET: 'chore/update-vds'
+    CHORE_DESCRIPTION: 'chore: Update VDS packages to latest versions'
 
 jobs:
     update-vds:
@@ -83,9 +89,7 @@ jobs:
                         state: 'open',
                         head: `${context.repo.owner}:chore/update-vds`
                       });
-                      const exists = pulls.some(pr => pr.title === 'chore: Update VDS packages');
-                      console.log(`Code Owner: ${context.repo.owner}`, `Repo: ${context.repo.repo}`, `Head: ${context.repo.owner}:chore/update-vds`);
-                      console.log(`Pull requests found: ${JSON.stringfy(pulls)}`);
+                      const exists = pulls.some(pr => pr.title === ${process.env.CHORE_DESCRIPTION});
                       core.setOutput("pr_exists", exists.toString());
 
             - name: Create PR if outdated and not already open
@@ -93,9 +97,9 @@ jobs:
               uses: peter-evans/create-pull-request@v5
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  branch: 'chore/update-vds'
-                  commit-message: 'chore: Update VDS packages to latest versions'
-                  title: 'chore: Update VDS packages'
+                  branch: ${{ env.BRANCH_TARGET }}
+                  commit-message: ${{ env.CHORE_DESCRIPTION }}
+                  title: ${{ env.CHORE_DESCRIPTION }}
                   body: |
                       This PR updates VDS packages to their latest versions across all package.json files in:
                       - apps directory
