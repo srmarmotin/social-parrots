@@ -77,7 +77,6 @@ jobs:
               uses: actions/github-script@v7
               with:
                   script: |
-                      pr_exists = "false";
                       const { data: pulls } = await github.rest.pulls.list({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
@@ -85,10 +84,7 @@ jobs:
                         head: `${context.repo.owner}:chore/update-vds`
                       });
                       const exists = pulls.some(pr => pr.title === 'chore: Update VDS packages');
-                      if (exists) {
-                        pr_exists = "true";
-                      }
-                      echo "pr_exists=$pr_exists" >> $GITHUB_OUTPUT
+                      core.setOutput("pr_exists", pr_exists);
 
             - name: Create PR if outdated and not already open
               if: ${{ steps.check-outdated.outputs.outdated == 'true' && steps.check_pr.outputs.pr_exists == 'false'}}
