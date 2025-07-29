@@ -88,7 +88,6 @@ jobs:
                       if (exists) {
                         pr_exists = "true";
                       }
-                      echo context.repo.owner + ":chore/update-vds";
                       echo "pr_exists=$pr_exists" >> $GITHUB_OUTPUT
 
             - name: Create PR if outdated and not already open
