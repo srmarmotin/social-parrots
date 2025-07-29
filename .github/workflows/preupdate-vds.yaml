@@ -87,9 +87,9 @@ jobs:
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         state: 'open',
-                        head: `${context.repo.owner}:chore/update-vds`
+                        head: `${context.repo.owner}:${{env.CHORE_DESCRIPTION}}`
                       });
-                      const exists = pulls.some(pr => pr.title === ${process.env.CHORE_DESCRIPTION});
+                      const exists = pulls.some(pr => pr.title === ${{env.CHORE_DESCRIPTION}});
                       core.setOutput("pr_exists", exists.toString());
 
             - name: Create PR if outdated and not already open
