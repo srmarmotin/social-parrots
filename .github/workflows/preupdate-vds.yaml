@@ -83,13 +83,15 @@ jobs:
               uses: actions/github-script@v7
               with:
                   script: |
+                      const branchName = process.env.BRANCH_TARGET;
+                      const prTitle = process.env.CHORE_DESCRIPTION;
                       const { data: pulls } = await github.rest.pulls.list({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         state: 'open',
-                        head: `${context.repo.owner}:${{env.CHORE_DESCRIPTION}}`
+                        head: `${context.repo.owner}:${branchName}`
                       });
-                      const exists = pulls.some(pr => pr.title === ${{env.CHORE_DESCRIPTION}});
+                      const exists = pulls.some(pr => pr.title === prTitle);
                       core.setOutput("pr_exists", exists.toString());
 
             - name: Create PR if outdated and not already open
