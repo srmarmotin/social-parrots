@@ -8,7 +8,6 @@ env:
     VDS_PACKAGES: '@inertiajs/react @types/react'
     TARGET_BRANCH: 'feature/PPIWEB-0000-update-vds'
     CHORE_DESCRIPTION: 'chore(PPIWEB-0000): Update vds package'
-    FEATURE_INSTANCE: 'https://web-mf-video-ppiweb-0000.shared.branch.paramountplus.com/'
 
 jobs:
     update-vds:
@@ -91,6 +90,9 @@ jobs:
                       app_name = `${{ matrix.apps }}`.split('/')[1];
                       core.setOutput("app_name", app_name);
 
+                      fi_name = `${{ matrix.apps }}`.startsWith('apps/') ? app_name : 'appshell';
+                      core.setOutput("fi_name", fi_name);
+
             - name: Create PR if outdated
               if: steps.check-outdated.outputs.outdated == 'true'
               uses: peter-evans/create-pull-request@v5
@@ -102,4 +104,4 @@ jobs:
                   body: |
                       This PR updates the following avia to it latest version for ${{ steps.check_pr.outputs.app_name }}
                       ### Feature Instance
-                      ${{ env.FEATURE_INSTANCE }}
+                      'https://web-mf-${{ steps.check_pr.outputs.fi_name }}-ppiweb-0000.shared.branch.paramountplus.com/'
