@@ -96,10 +96,10 @@ jobs:
               uses: peter-evans/create-pull-request@v5
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  branch: ${{ env.TARGET_BRANCH }}-${{ matrix.apps }}
+                  branch: ${{ env.TARGET_BRANCH }}-${{ steps.check_pr.outputs.app_name }}
                   commit-message: ${{env.CHORE_DESCRIPTION}} ${{ matrix.apps }}
                   title: ${{ env.CHORE_DESCRIPTION}} ${{ matrix.apps }}
                   body: |
-                      This PR updates the following avia to it latest version for ${ steps.check_pr.outputs.app_name }
+                      This PR updates the following avia to it latest version for ${{ steps.check_pr.outputs.app_name }}
                       ### Feature Instance
                       ${{ env.FEATURE_INSTANCE }}
