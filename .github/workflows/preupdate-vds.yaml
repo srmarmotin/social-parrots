@@ -1,20 +1,23 @@
 name: Package Pre Updater For VDS
-
 on:
-    schedule:
-        - cron: '0 0 * * *'
+    #schedule:
+    #- cron: '0 0 * * *'  # Runs daily at midnight
     workflow_dispatch:
-
 env:
-    PACKAGES: '@inertiajs/react @types/react'
-    PACKAGE_PATHS: './apps/*/package.json ./packages/*/package.json'
-    IGNORED_PATHS: '*/apps/ptv*/* */apps/chromecast*/* */node_modules/*'
-    BRANCH_TARGET: 'chore/update-vds'
-    CHORE_DESCRIPTION: 'chore: Update VDS packages to latest versions'
+    #Define packages and branch where updates will be made
+    VDS_PACKAGES: '@inertiajs/react @types/react'
+    TARGET_BRANCH: 'feature/PPIWEB-0000-update-vds'
+    CHORE_DESCRIPTION: 'chore(PPIWEB-0000): Update vds package'
+    FEATURE_INSTANCE: 'https://web-mf-video-ppiweb-0000.shared.branch.paramountplus.com/'
 
 jobs:
     update-vds:
         runs-on: ubuntu-latest
+        strategy:
+            #Matrix allows running the job for multiple apps
+            matrix:
+                apps:
+                    ['apps/account', 'apps/app-shell', 'apps/hubs', 'apps/signup', 'apps/video', 'packages/tn-formbuilder', 'packages/tn-foundation']
         permissions:
             contents: write
             pull-requests: write
@@ -25,46 +28,30 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: 22
+                  node-version: 22.14.0
 
             - name: Get latest versions and check outdated packages
               id: check-outdated
               run: |
                   outdated=""
+                  packages_path="${{ matrix.apps }}/package.json"
+                  tmp_file=packages_path.tmp
+                  cp packages_path "$tmp_file"
 
-                  for path in $PACKAGE_PATHS; do
-                    include+=" -o -path \"$path\""
+                  for pkg in $VDS_PACKAGES; do
+                    latest=$(npm view $pkg version)
+                    current=$(jq -r ".dependencies[\"$pkg\"]" "$packages_path")
+                    
+                    if [ -n "$current" ] && [ "$current" != "null" ] && [ "$current" != "$latest" ]; then
+                      echo "$pkg is outdated: $current --> $latest"
+                      jq --arg pkg "$pkg" --arg version "$latest" '
+                      if .dependencies[$pkg] then .dependencies[$pkg] = $version else . end
+                      ' "$tmp_file" > "$tmp_file.new" && mv "$tmp_file.new" "$tmp_file"
+                      outdated="true"
+                    fi
                   done
-                  find_cmd="find . \\(${include/-o /} \\)"
 
-                  for ignore in $IGNORED_PATHS; do
-                    find_cmd+=" -not -path \"$ignore\""
-                  done
-                  echo "Finding package.json files with command: $find_cmd"           
-                  pkg_files=$(eval $find_cmd)
-
-                  for pkg_file in $pkg_files; do
-                      echo "Checking $pkg_file for VDS packages..."
-                      tmp_file="${pkg_file}.tmp"
-                      cp "$pkg_file" "$tmp_file"
-
-                      for pkg in $PACKAGES; do
-                          latest=$(npm view $pkg version)
-                          current=$(jq -r ".dependencies[\"$pkg\"] // \"\"" "$pkg_file")
-
-                          if [ -n "$current" ] && [ "$current" != "null" ] && [ "$current" != "$latest" ]; then
-                              echo "$pkg is outdated in $pkg_file: $current --> $latest"
-                              jq --arg pkg "$pkg" --arg version "$latest" '
-                              if .dependencies[$pkg] then .dependencies[$pkg] = $version else . end
-                              ' "$tmp_file" > "$tmp_file.new" && mv "$tmp_file.new" "$tmp_file"
-                              outdated="true"
-                          fi
-                      done
-
-                      # Apply changes if any were made
-                      mv "$tmp_file" "$pkg_file"
-                      [ -f "$tmp_file.new" ] && rm "$tmp_file.new"
-                  done
+                  mv "$tmp_file" "$packages_path"
                   echo "outdated=$outdated" >> $GITHUB_OUTPUT
 
             - name: Install dependencies
@@ -83,26 +70,26 @@ jobs:
               uses: actions/github-script@v7
               with:
                   script: |
-                      const branchName = process.env.BRANCH_TARGET;
-                      const prTitle = process.env.CHORE_DESCRIPTION;
+                      const app_branch = `${process.env.TARGET_BRANCH}-${{ matrix.apps }}`;
+                      const chore_description = `${process.env.CHORE_DESCRIPTION} ${{ matrix.apps }}`;
                       const { data: pulls } = await github.rest.pulls.list({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         state: 'open',
-                        head: `${context.repo.owner}:${branchName}`
+                        head: `${context.repo.owner}:${app_branch}`
                       });
-                      const exists = pulls.some(pr => pr.title === prTitle);
+                      const exists = pulls.some(pr => pr.title === chore_description);
                       core.setOutput("pr_exists", exists.toString());
 
-            - name: Create PR if outdated and not already open
-              if: ${{ steps.check-outdated.outputs.outdated == 'true' && steps.check_pr.outputs.pr_exists == 'false'}}
+            - name: Create PR if outdated
+              if: steps.check-outdated.outputs.outdated == 'true'
               uses: peter-evans/create-pull-request@v5
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  branch: ${{ env.BRANCH_TARGET }}
-                  commit-message: ${{ env.CHORE_DESCRIPTION }}
-                  title: ${{ env.CHORE_DESCRIPTION }}
+                  branch: ${{ env.TARGET_BRANCH }}-${{ matrix.apps }}
+                  commit-message: ${{env.CHORE_DESCRIPTION}} ${{ matrix.apps }}
+                  title: ${{ env.CHORE_DESCRIPTION}} ${{ matrix.apps }}
                   body: |
-                      This PR updates VDS packages to their latest versions across all package.json files in:
-                      - apps directory
-                      - packages directory
+                      This PR updates the following avia to it latest version for ${{ matrix.apps }}
+                      ### Feature Instance
+                      ${{ env.FEATURE_INSTANCE }}
