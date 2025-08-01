@@ -16,7 +16,7 @@ jobs:
         strategy:
             #Matrix allows running the job for multiple apps
             matrix:
-                apps: ['apps/account', 'apps/hubs', 'apps/signup', 'packagez/tn-formbuilder', 'packagez/tn-foundation']
+                apps: ['apps/account', 'packagez/tn-foundation']
         permissions:
             contents: write
             pull-requests: write
