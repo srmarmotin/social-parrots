@@ -75,8 +75,12 @@ jobs:
               uses: actions/github-script@v7
               with:
                   script: |
-                      const app_branch = `${process.env.TARGET_BRANCH}-${{ matrix.apps }}`;
-                      const chore_description = `${process.env.CHORE_DESCRIPTION} ${{ matrix.apps }}`;
+                      const app_name = `${{ matrix.apps }}`.split('/')[1];
+                      core.setOutput("app_name", app_name);
+
+                      const app_branch = `${process.env.TARGET_BRANCH}-${app_name}`;
+                      const chore_description = `${process.env.CHORE_DESCRIPTION} ${app_name}`;
+
                       const { data: pulls } = await github.rest.pulls.list({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
@@ -86,9 +90,6 @@ jobs:
 
                       const exists = pulls.some(pr => pr.title === chore_description);
                       core.setOutput("pr_exists", exists.toString());
-
-                      app_name = `${{ matrix.apps }}`.split('/')[1];
-                      core.setOutput("app_name", app_name);
 
                       fi_name = `${{ matrix.apps }}`.startsWith('apps/') ? app_name : 'appshell';
                       core.setOutput("fi_name", fi_name);
