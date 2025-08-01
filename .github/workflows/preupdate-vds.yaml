@@ -94,7 +94,7 @@ jobs:
                       core.setOutput("fi_name", fi_name);
 
             - name: Create PR if outdated
-              if: steps.check-outdated.outputs.outdated == 'true' && steps.check_pr.outputs.pr_exists == 'false'
+              if: ${{ steps.check-outdated.outputs.outdated }} == 'true' && ${{ steps.check_pr.outputs.pr_exists }} == 'false'
               uses: peter-evans/create-pull-request@v5
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
