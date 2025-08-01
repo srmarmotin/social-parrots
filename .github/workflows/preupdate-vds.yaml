@@ -88,7 +88,7 @@ jobs:
                       const exists = pulls.some(pr => pr.title === chore_description);
                       core.setOutput("pr_exists", exists.toString());
 
-                      app_name = app_branch.split('/')[1];
+                      app_name = `${{ matrix.apps }}`.split('/')[1];
                       core.setOutput("app_name", app_name);
 
             - name: Create PR if outdated
