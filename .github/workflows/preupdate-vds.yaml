@@ -84,8 +84,12 @@ jobs:
                         state: 'open',
                         head: `${context.repo.owner}:${app_branch}`
                       });
+
                       const exists = pulls.some(pr => pr.title === chore_description);
                       core.setOutput("pr_exists", exists.toString());
+
+                      app_name = app_branch.split('/')[1];
+                      core.setOutput("app_name", app_name);
 
             - name: Create PR if outdated
               if: steps.check-outdated.outputs.outdated == 'true'
@@ -96,6 +100,6 @@ jobs:
                   commit-message: ${{env.CHORE_DESCRIPTION}} ${{ matrix.apps }}
                   title: ${{ env.CHORE_DESCRIPTION}} ${{ matrix.apps }}
                   body: |
-                      This PR updates the following avia to it latest version for ${{ matrix.apps }}
+                      This PR updates the following avia to it latest version for ${ steps.check_pr.outputs.app_name }
                       ### Feature Instance
                       ${{ env.FEATURE_INSTANCE }}
