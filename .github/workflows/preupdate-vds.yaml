@@ -104,4 +104,4 @@ jobs:
                   body: |
                       This PR updates the following avia to it latest version for ${{ steps.check_pr.outputs.app_name }}
                       ### Feature Instance
-                      'https://web-mf-${{ steps.check_pr.outputs.fi_name }}-ppiweb-0000.shared.branch.paramountplus.com/'
+                      https://web-mf-${{ steps.check_pr.outputs.fi_name }}-ppiweb-0000.shared.branch.paramountplus.com/
