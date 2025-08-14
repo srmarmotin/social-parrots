@@ -1,11 +1,11 @@
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { NavFooter } from '@/components/NavFooter';
+import { NavMain } from '@/components/NavMain';
+import { NavUser } from '@/components/NavUser';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/Sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
-import AppLogo from './app-logo';
+import { BookOpen, Dices, Folder, LayoutGrid } from 'lucide-react';
+import AppLogo from './AppLogo';
 
 const mainNavItems: NavItem[] = [
     {
@@ -16,6 +16,11 @@ const mainNavItems: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
+    {
+        title: 'Games',
+        href: 'https://github.com/laravel/react-starter-kit',
+        icon: Dices,
+    },
     {
         title: 'Repository',
         href: 'https://github.com/laravel/react-starter-kit',
