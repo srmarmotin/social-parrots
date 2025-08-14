@@ -118,5 +118,12 @@
         "resources/js/**/*.ts",
         "resources/js/**/*.d.ts",
         "resources/js/**/*.tsx",
+        "vite.config.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "vendor",
+        "storage",
+        "bootstrap/cache"
     ]
 }
