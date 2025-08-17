@@ -4,7 +4,7 @@ import { NavUser } from '@/components/NavUser';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/Sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Dices, Folder, LayoutGrid } from 'lucide-react';
+import { Dices, Gamepad, LayoutGrid, SquareUser, Swords, Tv, Users } from 'lucide-react';
 import AppLogo from './AppLogo';
 
 const mainNavItems: NavItem[] = [
@@ -13,23 +13,38 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
+    {
+        title: 'Players',
+        href: '/players',
+        icon: Users,
+    },
+    {
+        title: 'Avatars',
+        href: '/avatars',
+        icon: SquareUser,
+    },
+    {
+        title: 'Categories',
+        href: '/categories',
+        icon: Swords,
+    },
+    {
+        title: 'Rooms',
+        href: '/rooms',
+        icon: Tv,
+    },
+    {
+        title: 'Games',
+        href: '/games',
+        icon: Gamepad,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Games',
+        title: 'Web',
         href: 'https://github.com/laravel/react-starter-kit',
         icon: Dices,
-    },
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
     },
 ];
 
