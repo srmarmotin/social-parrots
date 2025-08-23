@@ -1,9 +1,9 @@
-
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
 type TableColumn = {
   key: string;
+  value: string;
   label: string;
   render?: (value: any, row: any) => React.ReactNode;
 };
@@ -37,7 +37,7 @@ function Table({ columns, data, className, ...props }: TableProps) {
           <tr key={i} className="border-b last:border-none">
             {columns.map((col) => (
               <td key={col.key} className="px-3 py-2">
-                {col.render ? col.render(row[col.key], row) : row[col.key]}
+                {col.render ? col.render(row[col.value], row) : row[col.value]}
               </td>
             ))}
           </tr>

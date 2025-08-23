@@ -1,11 +1,17 @@
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Table } from '@/components/ui/Table';
 import AppLayout from '@/layouts/AppLayout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Head } from '@inertiajs/react';
+import { Pencil } from 'lucide-react';
+import { useState } from 'react';
+import AddCategory from './AddCategory';
+import EditCategory from './EditCategory';
+
+type Categories = {
+    id: number;
+    name: string;
+    description: string;
+};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -14,54 +20,51 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Categories({ categories }) {
-    const { data, setData, post, processing, reset } = useForm<Required<{ category: string }>>({
-        category: '',
-    });
+export default function Categories({ categories }: { categories: Categories[] }) {
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [openEditModal, setOpenEditModal] = useState(false);
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-        post(route('categories.store'), {
-            onFinish: () => reset('category'),
-        });
+    const handleEditClick = (id: number) => {
+        setSelectedCategoryId(id);
+        setOpenEditModal(true);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Categories" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <form className="flex flex-col gap-6" onSubmit={submit}>
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-4">
-                        <Input
-                            type="text"
-                            id="category"
-                            placeholder="Add category"
-                            required
-                            value={data.category}
-                            onChange={(e) => setData('category', e.target.value)}
-                            className="rounded-md border"
-                            autoComplete="off"
-                        />
-                        <Button
-                            type="submit"
-                            className="w-6/12 rounded-md bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600"
-                            disabled={processing}
-                        >
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Add Category
-                        </Button>
-                    </div>
-                </form>
-            </div>
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <Table
-                    columns={[
-                        { key: 'name', label: 'Name' },
-                        { key: 'description', label: 'Description' },
-                    ]}
-                    data={categories}
-                />
-            </div>
+            <AddCategory />
+            {categories.length > 0 ? (
+                <div className="flex flex-initial flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                    <Table
+                        columns={[
+                            { key: 'id', value: 'id', label: 'Id' },
+                            { key: 'name', value: 'name', label: 'Name' },
+                            {
+                                key: 'image',
+                                value: 'thumbnail_url',
+                                label: 'Image',
+                                render: (value) => <img src={value} alt="Thumbnail" className="h-12 w-12 rounded" />,
+                            },
+                            {
+                                key: 'edit',
+                                value: 'id',
+                                label: 'Edit',
+                                render: (value) => (
+                                    <button onClick={() => handleEditClick(value)}>
+                                        <Pencil className="h-5 w-5 cursor-pointer" />
+                                    </button>
+                                ),
+                            },
+                        ]}
+                        data={categories}
+                    />
+                </div>
+            ) : (
+                <div className="p-4">
+                    <p>Nothing to see here!</p>
+                </div>
+            )}
+            {selectedCategoryId && <EditCategory openModal={openEditModal} setOpenModal={setOpenEditModal} categoryId={selectedCategoryId} />}
         </AppLayout>
     );
 }

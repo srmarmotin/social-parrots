@@ -14,7 +14,6 @@ createInertiaApp({
         const last = segments.pop()!;
         const pascalLast = last.replace(/(^\w|-\w)/g, (match) => match.replace('-', '').toUpperCase());
         const route = [...segments, pascalLast].join('/');
-        console.log(`Resolving page component for route: ${name}`);
         return resolvePageComponent(`./pages/${route}.tsx`, import.meta.glob('./pages/**/*.tsx'));
     },
     setup({ el, App, props }) {

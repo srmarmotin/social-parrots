@@ -63,4 +63,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('categories', [CategoriesController::class, 'store'])
         ->name('categories.store');
+
+    Route::get('categories/{id}', [CategoriesController::class, 'show'])
+        ->name('categories.show');
 });

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('question');
             $table->json('options')->nullable();
             $table->string('image_url')->nullable();
+            $table->string('thumbnail_url')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
