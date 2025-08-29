@@ -10,6 +10,7 @@ import { FormEventHandler, useEffect } from 'react';
 type CategoryForm = {
     name: string;
     image?: File | null;
+    image_url?: string | null;
 };
 
 export default function EditCategory({
@@ -85,6 +86,9 @@ export default function EditCategory({
                                 </progress>
                             )}
                             <InputError message={errors.image} />
+                        </div>
+                        <div className="mb-3 flex justify-center">
+                            {data.image_url && <img src={data.image_url} alt="Preview" className="w-32 rounded" />}
                         </div>
                         <div className="flex justify-between">
                             <DialogClose asChild>

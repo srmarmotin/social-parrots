@@ -35,4 +35,13 @@ class Category extends Model
             : null,
         );
     }
+
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value !== null
+            ? asset('storage/' . ltrim($value, '/'))
+            : null,
+        );
+    }
 }
