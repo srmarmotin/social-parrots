@@ -4,7 +4,7 @@ import { NavUser } from '@/components/NavUser';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/Sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Dices, Gamepad, LayoutGrid, SquareUser, Swords, Tv, Users } from 'lucide-react';
+import { ClipboardList, Dices, Gamepad, LayoutGrid, SquareUser, Swords, Tv, Users } from 'lucide-react';
 import AppLogo from './AppLogo';
 
 const mainNavItems: NavItem[] = [
@@ -27,6 +27,11 @@ const mainNavItems: NavItem[] = [
         title: 'Categories',
         href: '/categories',
         icon: Swords,
+    },
+    {
+        title: 'Questions',
+        href: '/questions',
+        icon: ClipboardList,
     },
     {
         title: 'Rooms',
